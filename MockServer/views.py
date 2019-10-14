@@ -29,7 +29,6 @@ class MockApi(MethodView):
             pass
         else:
             api_name = request.args.get('api_name')
-            print(api_name)
             m = models.Api.query.filter(models.Api.name.contains(api_name)).all()
             if m:
                 p = []

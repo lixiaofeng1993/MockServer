@@ -104,7 +104,6 @@ def domain_server(**kwargs):
         form = {}
     if data == {}:  # 不验证参数，直接返回有效数据
         return Validator.valid(response=kwargs.get('valid'))
-
     else:
         if len(form) != len(data):  # 预期参数和实际参数不匹配
             return json.dumps(MISS, ensure_ascii=False)
@@ -121,25 +120,25 @@ def domain_server(**kwargs):
                 if msg:
                     return msg
 
-                contains = expect.get('contains')
+                contains = expect.get('contains')  # 包含
                 if contains:
                     msg = Validator.is_not_contains(value, contains, response=invalid.get('contains'))
                     if msg:
                         return msg
 
-                equals = expect.get('equals')
+                equals = expect.get('equals')  # 相等
                 if equals:
                     msg = Validator.is_not_equals(value, equals, response=invalid.get('equals'))
                     if msg:
                         return msg
 
-                long = expect.get('long')
+                long = expect.get('long')  # 长度
                 if long:
                     msg = Validator.is_too_long(value, long, response=invalid.get('length'))
                     if msg:
                         return msg
 
-                between = expect.get('between')
+                between = expect.get('between')  # 在范围内
                 if between:
                     msg = Validator.is_not_between(value, between, response=invalid.get('between'))
                     if msg:
