@@ -90,58 +90,59 @@ def domain_server(**kwargs):
     :param kwargs: standard json mock scripts
     :return: response msg
     """
-    data = kwargs.get('data', {})
-    invalid = kwargs.get('invalid', {})
+    data = kwargs.get('data', {})  # 预期传递的参数
+    invalid = kwargs.get('invalid', {})  # 无效数据，验证参数后，返回无效数据
 
+    # 传递的参数
     if request.json:
         form = request.json
-
     elif request.form:
         form = request.form
-
     elif request.args:
         form = request.args
-
-    if data is {}:  # do not have any parameters
+    else:
+        form = {}
+    if data == {}:  # 不验证参数，直接返回有效数据
         return Validator.valid(response=kwargs.get('valid'))
 
     else:
-        if len(form) != len(data):  # data do not matched
+        if len(form) != len(data):  # 预期参数和实际参数不匹配
             return json.dumps(MISS, ensure_ascii=False)
 
         for key in form.keys():
-            if key not in data.keys():
+            if key not in data.keys():  # 预期参数和实际参数不一致
                 return json.dumps(INVALID, ensure_ascii=False)
 
-        for key, value in form.items():  # usually validators
+        for key, value in form.items():  # 参数值验证
             expect = data.get(key)
-            type = expect.get('type')
-            msg = Validator.type_not_match(type, value, response=invalid.get('type'))
-            if msg:
-                return msg
-
-            contains = expect.get('contains')
-            if contains:
-                msg = Validator.is_not_contains(value, contains, response=invalid.get('contains'))
+            if isinstance(expect, dict):
+                type_ = expect.get('type')  # 验证参数类型是否正确
+                msg = Validator.type_not_match(type_, value, response=invalid.get('type'))
                 if msg:
                     return msg
 
-            equals = expect.get('equals')
-            if equals:
-                msg = Validator.is_not_equals(value, equals, response=invalid.get('equals'))
-                if msg:
-                    return msg
+                contains = expect.get('contains')
+                if contains:
+                    msg = Validator.is_not_contains(value, contains, response=invalid.get('contains'))
+                    if msg:
+                        return msg
 
-            long = expect.get('long')
-            if long:
-                msg = Validator.is_too_long(value, long, response=invalid.get('length'))
-                if msg:
-                    return msg
+                equals = expect.get('equals')
+                if equals:
+                    msg = Validator.is_not_equals(value, equals, response=invalid.get('equals'))
+                    if msg:
+                        return msg
 
-            between = expect.get('between')
-            if between:
-                msg = Validator.is_not_between(value, between, response=invalid.get('between'))
-                if msg:
-                    return msg
+                long = expect.get('long')
+                if long:
+                    msg = Validator.is_too_long(value, long, response=invalid.get('length'))
+                    if msg:
+                        return msg
+
+                between = expect.get('between')
+                if between:
+                    msg = Validator.is_not_between(value, between, response=invalid.get('between'))
+                    if msg:
+                        return msg
 
         return Validator.valid(response=kwargs.get('valid'))

@@ -89,11 +89,13 @@ def insert_mock_data(**kwargs):
         body = {
             "name": name,
             "url": url,
-            "method": method.upper()
+            "method": method.upper(),
+            "data": {},
+            "invalid": {},
+            "valid": {}
         }
 
         body = json.dumps(body, encoding='utf-8', ensure_ascii=False, indent=4, separators=(',', ': '))
-
         m = models.Api(name=name, body=body, method=method, url=url, project_id=project)
         db.session.add(m)
         try:

@@ -9,7 +9,7 @@ from MockServer.response import VALID, INVALID
 from MockServer.validator import domain_server
 
 
-@app.route('/index/')
+@app.route('/')
 def index():
     p = models.Project.query.order_by(desc('id'))
     m = models.Api.query.all()
@@ -29,6 +29,7 @@ class MockApi(MethodView):
             pass
         else:
             api_name = request.args.get('api_name')
+            print(api_name)
             m = models.Api.query.filter(models.Api.name.contains(api_name)).all()
             if m:
                 p = []
@@ -36,7 +37,6 @@ class MockApi(MethodView):
                     t_p = models.Project.query.get(moo.project_id)
                     if t_p not in p:
                         p.append(t_p)
-
                 return render_template('index.html', p=p, m=m)
             else:
                 return redirect('/index/')
@@ -52,7 +52,6 @@ class MockApi(MethodView):
             msg = update_mock_data(api_id, **body)
         except UnmappedInstanceError:
             return json.dumps(INVALID, ensure_ascii=False)
-
         return json.dumps(msg, ensure_ascii=False)
 
     def delete(self, api_id):
